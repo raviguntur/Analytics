@@ -27,12 +27,29 @@ object ReadHotelData extends SparkJob with NamedRddSupport {
   override def runJob(sc: SparkContext, config: Config): Any = {
     config.getString("init.getdata") match {
       case "FREQUENT_SEARCHES" => get_frequentSearches(sc)
+      case "FREQUENT_PAGES" => get_frequentPages(sc)
     }
   }
 
   def get_frequentSearches(sc: SparkContext): Any = {
     val dataRDD = this.namedRdds.get[String]("thedata").get
     val dataModel = dataRDD.map { f => TransformStreamedData.fromString(f) }
-    dataModel.map(f => (1, f.phrase)).reduceByKey((a, b) => a + b).sortBy(_._1, false, 2).collect().toList
+    var counts = 1L
+
+    if (dataModel.count() > 0) counts = dataModel.count()
+
+    dataModel.filter(f => f != null).map(f => (f.phrase, 1)).
+      reduceByKey((a, b) => a + b).map(f => (f._1, 100 * f._2 / counts)).sortBy(_._2, false, 2).collect().toList
+  }
+
+  def get_frequentPages(sc: SparkContext): Any = {
+    val dataRDD = this.namedRdds.get[String]("thedata").get
+    val dataModel = dataRDD.map { f => TransformStreamedData.fromString(f) }
+    var counts = 1L
+
+    if (dataModel.count() > 0) counts = dataModel.count()
+
+    dataModel.filter(f => f != null).map(f => (f.pageAccessed, 1)).
+      reduceByKey((a, b) => a + b).map(f => (f._1, 100 * f._2 / counts)).sortBy(_._2, false, 2).collect().toList
   }
 }

@@ -41,8 +41,8 @@ object LoadHotelData extends SparkJob with NamedRddSupport {
       println("Received init message")
 
       var events = new SetupSource(ssc, KON.DATA_SOURCE_RABBIT).getDataHandle()
-      var reduced = events.window(Seconds(100)).map { f => f.toLowerCase() }
-      var windowData = sc.makeRDD(List("aaa", "bbb")).persist(MEMORY_AND_DISK_2)
+      var reduced = events.window(Seconds(10), Seconds(2)).map { f => f.toLowerCase() }
+      var windowData = sc.makeRDD(List[String]()).persist(MEMORY_AND_DISK_2)
       this.namedRdds.update("thedata", windowData)
 
       reduced.foreachRDD(rdd => {

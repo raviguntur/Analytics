@@ -1,0 +1,50 @@
+apply plugin: "java"
+apply plugin: "maven"
+apply plugin: 'scala'
+apply plugin: 'application'
+
+
+version = 1.0
+sourceCompatibility = 1.7
+
+jar {
+    manifest {
+        attributes 'Implementation-Title': 'Gradle Quickstart', 'Implementation-Version': version
+    }
+}
+
+repositories {
+    mavenCentral()
+
+}
+
+dependencies {
+
+    compile 'org.scala-lang:scala-library:2.10.3'
+    compile 'com.rabbitmq:amqp-client:3.3.0'
+    
+}
+sourceSets {
+    main {
+		scala {
+        	srcDirs 'src/main/scala'
+        }
+    }
+}
+
+sourceSets.main.java.srcDirs = []
+mainClassName = 'com.hack.rs.Main'
+
+
+task fatJar(type: Jar, dependsOn: assemble) {
+    baseName = project.name
+    if(mainClassName) {
+        from { (configurations.runtime).collect { it.isDirectory() ? it : zipTree(it) } }
+        manifest { attributes 'Main-Class': mainClassName }
+        exclude 'META-INF/*.SF'
+        with jar
+    } else {
+        println "Error creating fatJar. Main class not specified!"
+        exit(1)
+    }
+}
