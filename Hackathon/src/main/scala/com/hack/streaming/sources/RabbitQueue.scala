@@ -22,7 +22,7 @@ class RabbitQueue(rabbitConfig: RabbitConfig)
 
   def onStart() {
     println("Called onStart ")
-    new Thread("Network Port Receiver") {
+    new Thread("RabbitmQ Receiver") {
       override def run() { println("Initiating the data run"); receive() }
     }.start()
   }

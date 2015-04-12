@@ -2,27 +2,35 @@ package com.hack.streaming.Main
 
 import scala.collection.immutable.HashMap
 
-object Models {
+object Models extends Serializable {
 
-  class MessageParser(var data: String) {
-    def clean(): Array[String] = {
-      return data.split(":").filter(f => f.contains("-"))
-    }
+  class StreamedData(val time: String,
+    val uid: String,
+    val activity: String,
+    val page: String,
+    val id: Long,
+    val score: Float,
+    val sd: String,
+    val phrase: String)
 
-  }
-  class StreamedData(val phrase: String, val course: String)
     extends Serializable {
     override def toString(): String = {
-      "%s\t%s\n".format(phrase, course)
+      "%s\t%s\n".format(phrase, uid)
     }
   }
 }
 
 object TransformStreamedData extends Serializable {
   def fromString(in: String): Models.StreamedData = {
-    val parts = in.split("-")
-    new Models.StreamedData(parts(0), parts(1))
+    println("dada:" + in)
+    val parts = in.split(",")
+    new Models.StreamedData(parts(0), parts(1), parts(2), parts(3),
+      parts(4).toLong, parts(5).toFloat, parts(6), parts(8))
+  }
+  def tupleString(in: String) = {
+    val parts = in.split(",")
+    (parts(0), parts(1), parts(2), parts(3),
+      parts(4).toLong, parts(5).toFloat, parts(6), parts(8))
   }
 }
-
 
