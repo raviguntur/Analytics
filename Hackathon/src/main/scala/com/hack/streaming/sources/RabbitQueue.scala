@@ -73,7 +73,6 @@ class RabbitQueue(rabbitConfig: RabbitConfig)
       var consumer = new QueueingConsumer(channel);
 
       channel.basicConsume(rabbitConfig.resQueue, true, consumer);
-      println("Receiver.receiveMessage(): Waiting for message from response queue");
 
       var delivery = consumer.nextDelivery()
       var message = new String(delivery.getBody())
@@ -82,7 +81,6 @@ class RabbitQueue(rabbitConfig: RabbitConfig)
         store(message)
         delivery = consumer.nextDelivery()
         message = new String(delivery.getBody());
-        println("Message got is " + message)
       }
       println("Receiver.receiveMessage(): Got message from response queue");
       channel.close();

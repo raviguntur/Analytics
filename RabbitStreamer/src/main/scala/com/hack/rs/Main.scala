@@ -1,10 +1,8 @@
 package com.hack.rs
 
-import com.rabbitmq.client.Channel
-import com.rabbitmq.client.Connection
-import com.rabbitmq.client.ConnectionFactory
 import scala.io.Source
-import scala.collection.immutable.StringOps
+
+import com.rabbitmq.client.ConnectionFactory
 
 object Main {
 
@@ -14,20 +12,18 @@ object Main {
       val x = line.getBytes
       println(line)
       var factory = new ConnectionFactory()
-      val connection = factory.newConnection()
-      val channel = connection.createChannel();
-      channel.queueDeclare("com.hack.queue", false, false, false, null);
-
       factory.setHost("127.0.0.1")
       factory.setPort(5672)
       factory.setUsername("guest")
       factory.setPassword("guest")
-      Thread.sleep(1)
+
+      val connection = factory.newConnection()
+      val channel = connection.createChannel()
       channel.basicPublish("", "com.hack.queue", null, x);
-      channel.close();
+      Thread.sleep(2000)
+
       connection.close();
+
     }
-
   }
-
 }

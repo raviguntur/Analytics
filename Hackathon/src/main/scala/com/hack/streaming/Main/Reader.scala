@@ -39,7 +39,7 @@ object ReadHotelData extends SparkJob with NamedRddSupport {
     if (dataModel.count() > 0) counts = dataModel.count()
 
     dataModel.filter(f => f != null).map(f => (f.phrase, 1)).
-      reduceByKey((a, b) => a + b).map(f => (f._1, 100 * f._2 / counts)).sortBy(_._2, false, 2).collect().toList
+      reduceByKey((a, b) => a + b).map(f => (f._1, f._2)).sortBy(_._2, false, 2).collect().toList
   }
 
   def get_frequentPages(sc: SparkContext): Any = {
